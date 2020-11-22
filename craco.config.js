@@ -3,6 +3,14 @@ const { when } = require('@craco/craco');
 const { BundleAnalyzerPlugin } = require('webpack-bundle-analyzer');
 
 module.exports = {
+  module: {
+    rules: [
+      {
+        test: /\.worker\.ts$/,
+        use: ["workerize-loader", "ts-loader"]
+      }
+    ],
+  },
   webpack: {
     plugins: [
       new CopyPlugin({
@@ -19,5 +27,5 @@ module.exports = {
         })
       ], [])
     ],
-  },
+  }
 }

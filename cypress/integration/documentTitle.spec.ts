@@ -78,7 +78,7 @@ describe('Document Title', () => {
 
     it('markdown syntax removed third', () => {
       cy.get('.CodeMirror textarea')
-      .type(`# ${title} _asd_`)
+        .type(`# ${title} _asd_`)
       cy.title().should('eq', `${title} asd - HedgeDoc @ ${branding.name}`)
     })
   })

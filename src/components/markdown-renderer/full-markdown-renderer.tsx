@@ -6,14 +6,12 @@ import { InternalLink } from '../common/links/internal-link'
 import { ShowIf } from '../common/show-if/show-if'
 import { RawYAMLMetadata, YAMLMetaData } from '../editor/yaml-metadata/yaml-metadata'
 import { BasicMarkdownRenderer } from './basic-markdown-renderer'
-import { FullMarkdownItConfigurator } from './markdown-it-configurator/FullMarkdownItConfigurator'
-import { LineMarkers } from './replace-components/linemarker/line-number-marker'
-import { AdditionalMarkdownRendererProps, LineMarkerPosition } from './types'
-import { useCalculateLineMarkerPosition } from './utils/calculate-line-marker-positions'
-import { useReplacerInstanceListCreator } from './hooks/use-replacer-instance-list-creator'
 import { useExtractFirstHeadline } from './hooks/use-extract-first-headline'
 import { usePostMetaDataOnChange } from './hooks/use-post-meta-data-on-change'
 import { usePostTocAstOnChange } from './hooks/use-post-toc-ast-on-change'
+import { LineMarkers } from './replace-components/linemarker/line-number-marker'
+import { AdditionalMarkdownRendererProps, LineMarkerPosition } from './types'
+import { useCalculateLineMarkerPosition } from './utils/calculate-line-marker-positions'
 
 export interface FullMarkdownRendererProps {
   onFirstHeadingChange?: (firstHeading: string | undefined) => void
@@ -33,8 +31,6 @@ export const FullMarkdownRenderer: React.FC<FullMarkdownRendererProps & Addition
   className,
   wide
 }) => {
-  const allReplacers = useReplacerInstanceListCreator(onTaskCheckedChange)
-
   const [yamlError, setYamlError] = useState(false)
 
   const rawMetaRef = useRef<RawYAMLMetadata>()
@@ -47,22 +43,6 @@ export const FullMarkdownRenderer: React.FC<FullMarkdownRendererProps & Addition
 
   const tocAst = useRef<TocAst>()
   usePostTocAstOnChange(tocAst, onTocChange)
-
-  const markdownIt = useMemo(() => {
-    return (new FullMarkdownItConfigurator(
-      !!onMetaDataChange,
-      error => setYamlError(error),
-      rawMeta => {
-        rawMetaRef.current = rawMeta
-      },
-      toc => {
-        tocAst.current = toc
-      },
-      lineMarkers => {
-        currentLineMarkers.current = lineMarkers
-      }
-    )).buildConfiguredMarkdownIt()
-  }, [onMetaDataChange])
 
   const clearMetadata = useCallback(() => {
     rawMetaRef.current = undefined
@@ -77,8 +57,18 @@ export const FullMarkdownRenderer: React.FC<FullMarkdownRendererProps & Addition
           </Trans>
         </Alert>
       </ShowIf>
-      <BasicMarkdownRenderer className={className} wide={wide} content={content} componentReplacers={allReplacers}
-        markdownIt={markdownIt} documentReference={documentElement}
+      <BasicMarkdownRenderer
+        className={className}
+        wide={wide}
+        content={content}
+        markdownItType={'full'}
+        useFrontmatter={!!onMetaDataChange}
+        onYamlError={useMemo(() => { return error => setYamlError(error) }, [setYamlError])}
+        onRawMeta={useMemo(() => { return rawMeta => { rawMetaRef.current = rawMeta } }, [])}
+        onToc={useMemo(() => { return toc => { tocAst.current = toc } }, [])}
+        onLineMarkers={useMemo(() => { return lineMarkers => { currentLineMarkers.current = lineMarkers } }, [])}
+        onTaskCheckedChange={onTaskCheckedChange}
+        documentReference={documentElement}
         onBeforeRendering={clearMetadata}/>
     </div>
   )
