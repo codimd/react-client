@@ -33,6 +33,7 @@ import { useTranslation } from 'react-i18next'
 import { CodemirrorBinding } from 'y-codemirror'
 import { WebsocketProvider } from 'y-websocket'
 import * as Y from 'yjs'
+import { IndexeddbPersistence } from 'y-indexeddb'
 import { MaxLengthWarningModal } from '../editor-modals/max-length-warning-modal'
 import { ScrollProps, ScrollState } from '../synced-scroll/scroll-props'
 import { allHinters, findWordAtCursor } from './autocompletion'
@@ -198,6 +199,10 @@ export const EditorPane: React.FC<EditorPaneProps & ScrollProps> = ({
       const wsProvider = new WebsocketProvider('wss://yjs-test.hedgedoc.net', noteId, ydoc)
       const yText = ydoc.getText('codemirror')
       const binding = new CodemirrorBinding(yText, editor, wsProvider.awareness)
+      const persistence = new IndexeddbPersistence(`note-${noteId}`, ydoc)
+      persistence.once('synced', () => {
+        console.debug('Note content received from IndexedDB.')
+      })
     }
   }, [editor, noteId])
 
