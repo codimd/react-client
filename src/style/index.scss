@@ -10,6 +10,7 @@
 @import "~@fontsource/source-sans-pro/index";
 @import "fonts/twemoji/twemoji";
 @import '../../node_modules/fork-awesome/css/fork-awesome.min';
+@import './scrollbar';
 
 .text-black, body.dark .text-black {
   color: $black;

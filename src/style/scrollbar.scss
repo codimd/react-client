@@ -1,0 +1,23 @@
+/*!
+ * SPDX-FileCopyrightText: 2021 The HedgeDoc developers (see AUTHORS file)
+ *
+ * SPDX-License-Identifier: AGPL-3.0-only
+ */
+
+$scrollbar-background: #e8e8e8;
+$scrollbar-highlight: #929191;
+* {
+  scrollbar-color: $scrollbar-highlight $scrollbar-background;
+}
+
+::-webkit-scrollbar {
+  background-color: $scrollbar-background;
+}
+
+::-webkit-scrollbar-corner {
+  background-color: $scrollbar-highlight;
+}
+
+::-webkit-scrollbar-thumb {
+  background-color: $scrollbar-highlight;
+}
