@@ -16,7 +16,7 @@ interface GeneralLinkProp {
 }
 
 export interface LinkWithTextProps extends GeneralLinkProp {
-  text: string
+  text?: string
 }
 
 export interface TranslatedLinkProps extends GeneralLinkProp {

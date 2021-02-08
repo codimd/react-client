@@ -56,7 +56,7 @@ export const DocumentInfobar: React.FC<DocumentInfobarProps> = ({
         <span className={ 'ml-auto' }>
           { viewCount } <Trans i18nKey={ 'views.readOnly.viewCount' }/>
           <ShowIf condition={ editable }>
-            <InternalLink text={ '' } href={ `/n/${ noteId }` } icon={ 'pencil' }
+            <InternalLink href={ `/n/${ noteId }` } icon={ 'pencil' }
                           className={ 'text-primary text-decoration-none mx-1' }
                           title={ t('views.readOnly.editNote') }/>
           </ShowIf>
