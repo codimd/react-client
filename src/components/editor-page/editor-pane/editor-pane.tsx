@@ -85,7 +85,7 @@ export const EditorPane: React.FC<EditorPaneProps & ScrollProps> = ({
   const { t } = useTranslation()
   const maxLength = useApplicationState((state) => state.config.maxDocumentLength)
   const smartPasteEnabled = useApplicationState((state) => state.editorConfig.smartPaste)
-  const noteId = useSelector((state: ApplicationState) => state.documentContent.noteId)
+  const noteId = useSelector((state: ApplicationState) => state.noteDetails.id)
   const [showMaxLengthWarning, setShowMaxLengthWarning] = useState(false)
   const maxLengthWarningAlreadyShown = useRef(false)
   const [editor, setEditor] = useState<Editor>()
@@ -196,13 +196,19 @@ export const EditorPane: React.FC<EditorPaneProps & ScrollProps> = ({
   useEffect(() => {
     if (editor) {
       const ydoc = new Y.Doc()
-      const wsProvider = new WebsocketProvider('wss://yjs-test.hedgedoc.net', noteId, ydoc)
+      const wsProvider = new WebsocketProvider('wss://sync.hedgedoc.net', noteId, ydoc)
       const yText = ydoc.getText('codemirror')
       const binding = new CodemirrorBinding(yText, editor, wsProvider.awareness)
       const persistence = new IndexeddbPersistence(`note-${noteId}`, ydoc)
+      wsProvider.connectBc()
       persistence.once('synced', () => {
         console.debug('Note content received from IndexedDB.')
       })
+      return () => {
+        binding.destroy()
+        wsProvider.disconnect()
+        wsProvider.disconnectBc()
+      }
     }
   }, [editor, noteId])
 
