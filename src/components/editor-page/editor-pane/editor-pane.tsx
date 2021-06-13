@@ -218,7 +218,7 @@ export const EditorPane: React.FC<EditorPaneProps & ScrollProps> = ({
   const iframeCommunicator = useIFrameEditorToRendererCommunicator()
   useEffect(
     () =>
-      iframeCommunicator?.onImageUpload((dataUri, fileName) => {
+      iframeCommunicator.onImageUpload((dataUri, fileName) => {
         if (!editor) {
           return
         }
