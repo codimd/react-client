@@ -43,6 +43,7 @@ import { createStatusInfo, defaultState, StatusBar, StatusBarInfo } from './stat
 import { ToolBar } from './tool-bar/tool-bar'
 import { handleUpload } from './upload-handler'
 import { handleFilePaste, handleTablePaste, PasteEvent } from './tool-bar/utils/pasteHandlers'
+import { useWebsocketUrl } from '../hooks/useWebsocketUrl'
 import { useApplicationState } from '../../../hooks/common/use-application-state'
 
 export interface EditorPaneProps {
@@ -92,6 +93,7 @@ export const EditorPane: React.FC<EditorPaneProps & ScrollProps> = ({
   const [statusBarInfo, setStatusBarInfo] = useState<StatusBarInfo>(defaultState)
   const editorPreferences = useApplicationState((state) => state.editorConfig.preferences)
   const ligaturesEnabled = useApplicationState((state) => state.editorConfig.ligatures)
+  const wsUrl = useWebsocketUrl()
 
   const lastScrollPosition = useRef<number>()
   const [editorScroll, setEditorScroll] = useState<ScrollInfo>()
@@ -196,7 +198,7 @@ export const EditorPane: React.FC<EditorPaneProps & ScrollProps> = ({
   useEffect(() => {
     if (editor) {
       const ydoc = new Y.Doc()
-      const wsProvider = new WebsocketProvider('wss://sync.hedgedoc.net', noteId, ydoc)
+      const wsProvider = new WebsocketProvider(wsUrl, noteId, ydoc)
       const yText = ydoc.getText('codemirror')
       const binding = new CodemirrorBinding(yText, editor, wsProvider.awareness)
       const persistence = new IndexeddbPersistence(`note-${noteId}`, ydoc)
@@ -210,7 +212,7 @@ export const EditorPane: React.FC<EditorPaneProps & ScrollProps> = ({
         wsProvider.disconnectBc()
       }
     }
-  }, [editor, noteId])
+  }, [editor, noteId, wsUrl])
 
   const onMaxLengthHide = useCallback(() => setShowMaxLengthWarning(false), [])
 
