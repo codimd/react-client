@@ -30,6 +30,10 @@ import 'codemirror/mode/gfm/gfm'
 import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import { Controlled as ControlledCodeMirror } from 'react-codemirror2'
 import { useTranslation } from 'react-i18next'
+import { CodemirrorBinding } from 'y-codemirror'
+import { WebsocketProvider } from 'y-websocket'
+import * as Y from 'yjs'
+import { IndexeddbPersistence } from 'y-indexeddb'
 import { MaxLengthWarningModal } from '../editor-modals/max-length-warning-modal'
 import { ScrollProps, ScrollState } from '../synced-scroll/scroll-props'
 import { allHinters, findWordAtCursor } from './autocompletion'
@@ -39,6 +43,7 @@ import { createStatusInfo, defaultState, StatusBar, StatusBarInfo } from './stat
 import { ToolBar } from './tool-bar/tool-bar'
 import { handleUpload } from './upload-handler'
 import { handleFilePaste, handleTablePaste, PasteEvent } from './tool-bar/utils/pasteHandlers'
+import { useWebsocketUrl } from '../hooks/useWebsocketUrl'
 import { useApplicationState } from '../../../hooks/common/use-application-state'
 
 export interface EditorPaneProps {
@@ -81,12 +86,14 @@ export const EditorPane: React.FC<EditorPaneProps & ScrollProps> = ({
   const { t } = useTranslation()
   const maxLength = useApplicationState((state) => state.config.maxDocumentLength)
   const smartPasteEnabled = useApplicationState((state) => state.editorConfig.smartPaste)
+  const noteId = useSelector((state: ApplicationState) => state.noteDetails.id)
   const [showMaxLengthWarning, setShowMaxLengthWarning] = useState(false)
   const maxLengthWarningAlreadyShown = useRef(false)
   const [editor, setEditor] = useState<Editor>()
   const [statusBarInfo, setStatusBarInfo] = useState<StatusBarInfo>(defaultState)
   const editorPreferences = useApplicationState((state) => state.editorConfig.preferences)
   const ligaturesEnabled = useApplicationState((state) => state.editorConfig.ligatures)
+  const wsUrl = useWebsocketUrl()
 
   const lastScrollPosition = useRef<number>()
   const [editorScroll, setEditorScroll] = useState<ScrollInfo>()
@@ -187,6 +194,25 @@ export const EditorPane: React.FC<EditorPaneProps & ScrollProps> = ({
       handleUpload(files[0], dropEditor)
     }
   }, [])
+
+  useEffect(() => {
+    if (editor) {
+      const ydoc = new Y.Doc()
+      const wsProvider = new WebsocketProvider(wsUrl, noteId, ydoc)
+      const yText = ydoc.getText('codemirror')
+      const binding = new CodemirrorBinding(yText, editor, wsProvider.awareness)
+      const persistence = new IndexeddbPersistence(`note-${noteId}`, ydoc)
+      wsProvider.connectBc()
+      persistence.once('synced', () => {
+        console.debug('Note content received from IndexedDB.')
+      })
+      return () => {
+        binding.destroy()
+        wsProvider.disconnect()
+        wsProvider.disconnectBc()
+      }
+    }
+  }, [editor, noteId, wsUrl])
 
   const onMaxLengthHide = useCallback(() => setShowMaxLengthWarning(false), [])
 
