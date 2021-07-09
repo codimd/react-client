@@ -4,7 +4,7 @@
  * SPDX-License-Identifier: AGPL-3.0-only
  */
 
-import { RegexOptions } from '../../../../external-types/markdown-it-regex/interface'
+import { RegexOptions } from '../../../../../types/markdown-it-regex/interface'
 
 const finalRegex = /^{%gist (\w+\/\w+) ?%}$/
 
