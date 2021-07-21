@@ -9,21 +9,24 @@ import i18n from 'i18next'
 import { uploadFile } from '../../../api/media'
 import { store } from '../../../redux'
 import { supportedMimeTypes } from '../../common/upload-image-mimetypes'
+import { replaceInMarkdownContent } from '../../../redux/note-details/methods'
 
 export const handleUpload = (file: File, editor: Editor): void => {
   if (!file) {
     return
   }
   if (!supportedMimeTypes.includes(file.type)) {
-    // this mimetype is not supported
     return
   }
   const cursor = editor.getCursor()
-  const uploadPlaceholder = `![${i18n.t('editor.upload.uploadFile', { fileName: file.name })}]()`
+  const randomId = Math.random().toString(36).substr(7)
+  const label = i18n.t('editor.upload.uploadFile', { fileName: file.name })
+  const uploadPlaceholder = `![${label}](upload-${randomId})`
   const noteId = store.getState().noteDetails.id
   const insertCode = (replacement: string) => {
-    editor.replaceRange(replacement, cursor, { line: cursor.line, ch: cursor.ch + uploadPlaceholder.length }, '+input')
+    replaceInMarkdownContent(uploadPlaceholder, replacement)
   }
+
   editor.replaceRange(uploadPlaceholder, cursor, cursor, '+input')
   uploadFile(noteId, file)
     .then(({ link }) => {
@@ -31,6 +34,6 @@ export const handleUpload = (file: File, editor: Editor): void => {
     })
     .catch((error) => {
       console.error('error while uploading file', error)
-      insertCode('')
+      insertCode(`![upload of ${file.name} failed]()`)
     })
 }

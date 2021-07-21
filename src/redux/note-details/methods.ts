@@ -10,6 +10,7 @@ import { NoteFrontmatter } from '../../components/editor-page/note-frontmatter/n
 import { initialState } from './reducers'
 import {
   NoteDetailsActionType,
+  ReplaceInMarkdownContentAction,
   SetCheckboxInMarkdownContentAction,
   SetNoteDetailsAction,
   SetNoteDetailsFromServerAction,
@@ -29,6 +30,14 @@ export const setNoteDataFromServer = (apiResponse: NoteDto): void => {
     type: NoteDetailsActionType.SET_NOTE_DATA_FROM_SERVER,
     note: apiResponse
   } as SetNoteDetailsFromServerAction)
+}
+
+export const replaceInMarkdownContent = (placeholder: string, replacement: string): void => {
+  store.dispatch({
+    type: NoteDetailsActionType.REPLACE_IN_MARKDOWN_CONTENT,
+    placeholder,
+    replacement
+  } as ReplaceInMarkdownContentAction)
 }
 
 export const updateNoteTitleByFirstHeading = (firstHeading?: string): void => {
