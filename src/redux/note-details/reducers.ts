@@ -15,6 +15,7 @@ import {
   NoteDetails,
   NoteDetailsAction,
   NoteDetailsActionType,
+  ReplaceInMarkdownContentAction,
   SetCheckboxInMarkdownContentAction,
   SetNoteDetailsAction,
   SetNoteDetailsFromServerAction,
@@ -52,6 +53,10 @@ export const initialState: NoteDetails = {
   }
 }
 
+function replaceInMarkdownContent(markdownContent: string, placeholder: string, replacement: string) {
+  return markdownContent.replaceAll(placeholder, replacement)
+}
+
 export const NoteDetailsReducer: Reducer<NoteDetails, NoteDetailsAction> = (
   state: NoteDetails = initialState,
   action: NoteDetailsAction
@@ -61,6 +66,15 @@ export const NoteDetailsReducer: Reducer<NoteDetails, NoteDetailsAction> = (
       return {
         ...state,
         markdownContent: (action as SetNoteDetailsAction).content
+      }
+    case NoteDetailsActionType.REPLACE_IN_MARKDOWN_CONTENT:
+      return {
+        ...state,
+        markdownContent: replaceInMarkdownContent(
+          state.markdownContent,
+          (action as ReplaceInMarkdownContentAction).placeholder,
+          (action as ReplaceInMarkdownContentAction).replacement
+        )
       }
     case NoteDetailsActionType.UPDATE_NOTE_TITLE_BY_FIRST_HEADING:
       return {

@@ -14,7 +14,8 @@ export enum NoteDetailsActionType {
   SET_NOTE_DATA_FROM_SERVER = 'note-details/data/server/set',
   SET_NOTE_FRONTMATTER = 'note-details/frontmatter/set',
   UPDATE_NOTE_TITLE_BY_FIRST_HEADING = 'note-details/update-note-title-by-first-heading',
-  SET_CHECKBOX_IN_MARKDOWN_CONTENT = 'note-details/toggle-checkbox-in-markdown-content'
+  SET_CHECKBOX_IN_MARKDOWN_CONTENT = 'note-details/toggle-checkbox-in-markdown-content',
+  REPLACE_IN_MARKDOWN_CONTENT = 'note-details/replace-in-markdown-content'
 }
 
 interface LastChange {
@@ -52,6 +53,12 @@ export interface SetNoteDetailsFromServerAction extends NoteDetailsAction {
 export interface UpdateNoteTitleByFirstHeadingAction extends NoteDetailsAction {
   type: NoteDetailsActionType.UPDATE_NOTE_TITLE_BY_FIRST_HEADING
   firstHeading?: string
+}
+
+export interface ReplaceInMarkdownContentAction extends NoteDetailsAction {
+  type: NoteDetailsActionType.REPLACE_IN_MARKDOWN_CONTENT
+  placeholder: string
+  replacement: string
 }
 
 export interface SetNoteFrontmatterFromRenderingAction extends NoteDetailsAction {
