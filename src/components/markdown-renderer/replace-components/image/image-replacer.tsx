@@ -9,9 +9,11 @@ import React from 'react'
 import { ComponentReplacer } from '../ComponentReplacer'
 import { ProxyImageFrame } from './proxy-image-frame'
 import { IframeSendingPlaceholderImageFrame } from './iframe-sending-placeholder-image-frame'
-import { uploadIdRegex, UploadIndicatingFrame } from './upload-indicating-frame'
+import { UploadIndicatingFrame } from './upload-indicating-frame'
 
 export type ImageClickHandler = (event: React.MouseEvent<HTMLImageElement, MouseEvent>) => void
+
+const uploadIdRegex = /^upload-(.*)$/
 
 /**
  * Detects image tags and either

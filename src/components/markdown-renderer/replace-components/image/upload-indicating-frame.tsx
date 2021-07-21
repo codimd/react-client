@@ -13,8 +13,6 @@ export interface PlaceholderImageFrameProps {
   height?: string | number
 }
 
-export const uploadIdRegex = /^upload-(.*)$/
-
 /**
  * Shows a placeholder frame for images that are currently uploaded.
  *
